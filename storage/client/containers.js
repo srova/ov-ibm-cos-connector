@@ -72,18 +72,20 @@ exports.getContainer = function(container, callback) {
     var containerName = container instanceof storage.Container ? container.name : container,
         self = this;
 
-    self.s3.listObjects({
-        Bucket: self.ovConfig.ovBucket
-    }, function(err, data) {
-        if (err) {
-            callback(err);
-        } else {
-            console.log(data);
-            //data = _.filter(data, function(d) { retuen d})
-            callback(null, new (storage.Container)(self, data));
-        }
+    callback(null, new (storage.Container)(self, {name: containerName}));
 
-    });
+    // self.s3.listObjects({
+    //     Bucket: self.ovConfig.ovBucket
+    // }, function(err, data) {
+    //     if (err) {
+    //         callback(err);
+    //     } else {
+    //         console.log(data);
+    //         //data = _.filter(data, function(d) { retuen d})
+    //         callback(null, new (storage.Container)(self, data));
+    //     }
+    //
+    // });
 };
 
 //
