@@ -10,87 +10,93 @@ var util = require('util'),
     base = require('./core/base');
 
 var userAgent = AWS.util.userAgent();
-var Client = exports.Client = function (options) {
-  var self = this;
+var Client = exports.Client = function(options) {
+    var self = this;
 
-  base.Client.call(this, options);
+    base.Client.call(this, options);
 
-  options = options || {};
+    options = options || {};
 
-  // Allow overriding serversUrl in child classes
-  this.provider   = 'ibm';
-  this.endpoint = options.endpoint;
-  this.securityGroup = options.securityGroup;
-  this.securityGroupId = options.securityGroupId;
-  this.version = options.version || '2014-06-15';
-  this.protocol = options.protocol || 'https://';
+    // Allow overriding serversUrl in child classes
+    this.provider = 'ibm';
+    this.endpoint = options.endpoint;
+    this.securityGroup = options.securityGroup;
+    this.securityGroupId = options.securityGroupId;
+    this.version = options.version || '2014-06-15';
+    this.protocol = options.protocol || 'https://';
 
-  // support either key/accessKey syntax
-  this.config.key = this.config.key || options.accessKey;
-  this.config.keyId = this.config.keyId || options.accessKeyId;
+    // support either key/accessKey syntax
+    this.config.key = this.config.key || options.accessKey;
+    this.config.keyId = this.config.keyId || options.accessKeyId;
 
-  this._awsConfig = {
-    accessKeyId: this.config.keyId,
-    secretAccessKey: this.config.key,
-    region: options.region,
-    s3ForcePathStyle: options.forcePathBucket,
-    endpoint: this.config.endpoint,
-    apiKeyId: this.config.apiKeyId,
-    ibmAuthEndpoint: this.config.ibmAuthEndpoint,
-    serviceInstanceId: this.config.serviceInstanceId
-  };
-
-  // TODO think about a proxy option for pkgcloud
-  // enable forwarding to mock test server
-  if (options.serversUrl) {
-    this._awsConfig.httpOptions = {
-      proxy: this.protocol + options.serversUrl
+    this._awsConfig = {
+        accessKeyId: this.config.keyId,
+        secretAccessKey: this.config.key,
+        region: options.region,
+        s3ForcePathStyle: options.forcePathBucket,
+        endpoint: this.config.endpoint,
+        apiKeyId: this.config.apiKeyId,
+        ibmAuthEndpoint: this.config.ibmAuthEndpoint,
+        serviceInstanceId: this.config.serviceInstanceId
     };
-  }
 
-  if (options.endpoint) {
-    this._awsConfig.endpoint = new AWS.Endpoint(options.endpoint);
-  }
+    //srova
+    this.ovConfig = {
+        ovBucket:  this.config.ovBucket,
+        ovLocationConstraint:  this.config.ovLocationConstraint,
+    };
 
-  this.userAgent = util.format('%s %s', self.getUserAgent(), userAgent);
+    // TODO think about a proxy option for pkgcloud
+    // enable forwarding to mock test server
+    if (options.serversUrl) {
+        this._awsConfig.httpOptions = {
+            proxy: this.protocol + options.serversUrl
+        };
+    }
 
-  // Setup a custom user agent for pkgcloud
-  AWS.util.userAgent = function () {
-    return self.userAgent;
-  };
+    if (options.endpoint) {
+        this._awsConfig.endpoint = new AWS.Endpoint(options.endpoint);
+    }
 
-  if (!this.before) {
-    this.before = [];
-  }
+    this.userAgent = util.format('%s %s', self.getUserAgent(), userAgent);
+
+    // Setup a custom user agent for pkgcloud
+    AWS.util.userAgent = function() {
+        return self.userAgent;
+    };
+
+    if (!this.before) {
+        this.before = [];
+    }
 };
 
 util.inherits(Client, base.Client);
 //util.inherits(Client, require('./storage').Client);
 
 Client.prototype._toArray = function toArray(obj) {
-  if (typeof obj === 'undefined') {
-    return [];
-  }
+    if (typeof obj === 'undefined') {
+        return [];
+    }
 
-  return Array.isArray(obj) ? obj : [obj];
+    return Array.isArray(obj) ? obj : [obj];
 };
 
 Client.prototype.failCodes = {
-  400: 'Bad Request',
-  401: 'Unauthorized',
-  403: 'Resize not allowed',
-  404: 'Item not found',
-  409: 'Build in progress',
-  413: 'Over Limit',
-  415: 'Bad Media Type',
-  500: 'Fault',
-  503: 'Service Unavailable'
+    400: 'Bad Request',
+    401: 'Unauthorized',
+    403: 'Resize not allowed',
+    404: 'Item not found',
+    409: 'Build in progress',
+    413: 'Over Limit',
+    415: 'Bad Media Type',
+    500: 'Fault',
+    503: 'Service Unavailable'
 };
 
 Client.prototype.successCodes = {
-  200: 'OK',
-  201: 'Created',
-  202: 'Accepted',
-  203: 'Non-authoritative information',
-  204: 'No content'
+    200: 'OK',
+    201: 'Created',
+    202: 'Accepted',
+    203: 'Non-authoritative information',
+    204: 'No content'
 };
